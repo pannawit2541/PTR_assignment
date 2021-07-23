@@ -1,5 +1,7 @@
 import numpy as np
 from numpy import linalg as LA
+import matplotlib
+import matplotlib.pyplot as plt
 
 # mean
 def mean(x): return x.mean(axis=0)
@@ -33,20 +35,16 @@ def cross_validations_split(shape,folds):
 def prob_of_p(n,N):
     return n/N
 
-
 # for 2 classes
 def bayes_rules(f1,f2,p1,p2):
     likelihood_ratio = f1/f2
     threshold = p2/p1
     decision_matrix =  (likelihood_ratio > threshold)
     
-    # unique, counts = np.unique(y_pred, return_counts=True)
-    # print(dict(zip(unique, counts)))
-
     return np.where(decision_matrix,np.float64(1),np.float64(2)).reshape(-1)
 
 # confusion matrix
-def confusion_matrix(y_pred,y_true):
+def confusion_matrix(y_pred,y_true,err = False):
 
     if y_true.shape != y_pred.shape : return
 
@@ -72,6 +70,8 @@ def confusion_matrix(y_pred,y_true):
         else:
             matrix[1][1] += 1
 
+    if err: 
+        return matrix,100-(matrix[0][0]+matrix[1][1])*100/y_true.shape[0]
     return matrix
 
 
@@ -90,11 +90,14 @@ if __name__ == "__main__":
         features_1 = x_population[x_population[:,-1] == 1][:,:-1]
         features_2 = x_population[x_population[:,-1] == 2][:,:-1]
   
+        # calculate multivariate normal distribution
         f1 = multi_distribution(x_samples[:,:-1],cov_matrix(features_1),mean(features_1))
         f2 = multi_distribution(x_samples[:,:-1],cov_matrix(features_2),mean(features_2))
 
-        p1 = prob_of_p(features_1.shape[0],x_population.shape[0])
-        p2 = prob_of_p(features_2.shape[0],x_population.shape[0])
+        # calculate P(Wi)
+        p1 = prob_of_p(x_samples[x_samples[:,-1] == 1][:,:-1].shape[0],x_samples.shape[0])
+        p2 = prob_of_p(x_samples[x_samples[:,-1] == 2][:,:-1].shape[0],x_samples.shape[0])
+
         y_pred = bayes_rules(f1,f2,p1,p2)
         y_true = x_samples[:,-1]
      
