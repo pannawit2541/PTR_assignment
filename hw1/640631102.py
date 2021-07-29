@@ -111,16 +111,29 @@ if __name__ == "__main__":
     for i,j in cross_validations_split(data.shape[0],10):
 
         # * --------------- preprocess data ---------------
-        x = preprocess_data(data,i,j)
+        x1 = preprocess_data(data,i,j) # for test 1
+        x2 = preprocess_data(data[:,[0,1,-1]],i,j) # for test 2
+        
+        # calculate multivariate normal distribution test 1
+        fx1_1 = multi_distribution(x1['x_sample'],cov_matrix(x1['x_class1']),mean(x1['x_class1']))
+        fx1_2 = multi_distribution(x1['x_sample'],cov_matrix(x1['x_class2']),mean(x1['x_class2']))
+        
+        # calculate multivariate normal distribution test 2
+        fx2_1 = multi_distribution(x2['x_sample'],cov_matrix(x2['x_class1']),mean(x2['x_class1']))
+        fx2_2 = multi_distribution(x2['x_sample'],cov_matrix(x2['x_class2']),mean(x2['x_class2']))
 
-        # calculate multivariate normal distribution
-        f1 = multi_distribution(x['x_sample'],cov_matrix(x['x_class1']),mean(x['x_class1']))
-        f2 = multi_distribution(x['x_sample'],cov_matrix(x['x_class2']),mean(x['x_class2']))
+        # evaluate test 1
+        y_pred1 = bayes_rules(fx1_1,fx1_2,x1['p1'],x1['p2'])
+        y_true1 = x1['y_sample']
 
-        # evaluate
-        y_pred = bayes_rules(f1,f2,x['p1'],x['p2'])
-        y_true = x['y_sample']
-        print(confusion_matrix(y_pred,y_true,err=True))
+        # evaluate test 1
+        y_pred2 = bayes_rules(fx2_1,fx2_2,x2['p1'],x2['p2'])
+        y_true2 = x2['y_sample']
+
+
+        print(confusion_matrix(y_pred1,y_true1))
+        print(confusion_matrix(y_pred2,y_true2))
+        print("--------------------------------")
 
 
     
