@@ -15,13 +15,20 @@ def cov_matrix(x):
     return np.dot((x-mean(x)).T,(x-std(x)))*(1/fact)
 
 # multivariate normal distribution
-def multi_distribution(x,cov,mean): 
+def multi_distribution(X,cov,mean): 
     const = ((2*np.pi)**(cov.shape[1]/2))
     cov_norm = LA.norm(cov)**(0.5)
-    exp = np.exp(-0.5*np.dot(np.dot((x-mean),LA.inv(cov)),(x-mean).T))
 
-    return ((1/(const*cov_norm))*exp).diagonal().reshape(-1,1) # return only diagonal values
+    # ? if err : use this below
+    # exp = np.exp(-0.5*np.dot(np.dot((X-mean),LA.inv(cov)),(X-mean).T))
+    # return ((1/(const*cov_norm))*exp).diagonal().reshape(-1,1) # return only diagonal values
+    # ? ------------------------
 
+    exp = np.array(list(map(lambda x: np.exp(-0.5*np.dot(np.dot((x-mean),LA.inv(cov)),(x-mean).T)),X)))
+    return ((1/(const*cov_norm))*exp) 
+    
+
+# cross_validations
 def cross_validations_split(shape,folds):
     fold_size = int(shape * folds/100)
     k = 0
@@ -74,7 +81,27 @@ def confusion_matrix(y_pred,y_true,err = False):
         return matrix,100-(matrix[0][0]+matrix[1][1])*100/y_true.shape[0]
     return matrix
 
+def preprocess_data(data,i,j):
 
+    population = np.concatenate((data[:i],data[j:]))
+    samples = data[i:j]
+
+    # calculate P(Wi)
+    p1 = prob_of_p(population[population[:,-1] == 1][:,:-1].shape[0],population.shape[0])
+    p2 = prob_of_p(population[population[:,-1] == 2][:,:-1].shape[0],population.shape[0])
+    
+    pre_data = {
+        'population' : population,
+        'x_sample' : samples[:,:-1],
+        'x_class1' : population[population[:,-1] == 1][:,:-1], # separate the data to class 1
+        'x_class2' : population[population[:,-1] == 2][:,:-1], # separate the data to class 2
+        'p1': p1,
+        'p2': p2,
+        'y_sample': samples[:,-1]
+    }
+    return pre_data
+
+# main
 if __name__ == "__main__":
 
     # split features and classes to two classes
@@ -82,26 +109,18 @@ if __name__ == "__main__":
     np.random.shuffle(data) # shuffle data
 
     for i,j in cross_validations_split(data.shape[0],10):
-        
-        x_population =  np.concatenate((data[:i],data[j:]))
-        x_samples =  data[i:j]
 
-        # separate the data to two class
-        features_1 = x_population[x_population[:,-1] == 1][:,:-1]
-        features_2 = x_population[x_population[:,-1] == 2][:,:-1]
-  
+        # * --------------- preprocess data ---------------
+        x = preprocess_data(data,i,j)
+
         # calculate multivariate normal distribution
-        f1 = multi_distribution(x_samples[:,:-1],cov_matrix(features_1),mean(features_1))
-        f2 = multi_distribution(x_samples[:,:-1],cov_matrix(features_2),mean(features_2))
+        f1 = multi_distribution(x['x_sample'],cov_matrix(x['x_class1']),mean(x['x_class1']))
+        f2 = multi_distribution(x['x_sample'],cov_matrix(x['x_class2']),mean(x['x_class2']))
 
-        # calculate P(Wi)
-        p1 = prob_of_p(x_samples[x_samples[:,-1] == 1][:,:-1].shape[0],x_samples.shape[0])
-        p2 = prob_of_p(x_samples[x_samples[:,-1] == 2][:,:-1].shape[0],x_samples.shape[0])
-
-        y_pred = bayes_rules(f1,f2,p1,p2)
-        y_true = x_samples[:,-1]
-     
-        print(confusion_matrix(y_pred,y_true))
+        # evaluate
+        y_pred = bayes_rules(f1,f2,x['p1'],x['p2'])
+        y_true = x['y_sample']
+        print(confusion_matrix(y_pred,y_true,err=True))
 
 
     
