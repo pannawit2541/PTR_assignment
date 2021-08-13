@@ -1,0 +1,158 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-gb">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>Copenhagen Chromosome Database</title>
+<style>
+<!--
+body         { font-family: Arial }
+-->
+</style>
+</head>
+
+<body>
+
+<h2 align="center">Copenhagen Chromosome Database</h2>
+<p align="center"><font size="2">These notes were added by <a href="http://cswww.essex.ac.uk/staff/lucas.htm">Simon
+Lucas</a> from descriptions given by <a href="http://www.cs.utk.edu/~jgregor/">Jens
+Gregor</a> and <a href="http://www.iti.upv.es/~evidal/">Enrique Vidal</a></font>.</p>
+<p align="left">I am grateful to <a href="http://www.cs.utk.edu/~jgregor/">Jens
+Gregor</a> for kindly providing this dataset, and to <a href="http://www.iti.upv.es/~evidal/">Enrique
+Vidal</a> for help in setting it up.</p>
+<p align="left">If you publish a paper that includes results on this dataset,
+please include references to the papers described below:</p>
+<pre>@article(Lundsteen-al80,
+  author = &quot;C Lundsteen and J Phillip and E Granum&quot;,
+  title = &quot;Quantitative analysis of 6985 digitized trypsin {G}-banded human metaphase chromosomes&quot;,
+  journal = &quot;Clinical Genetics&quot;,
+  volume = 18,
+  pages = &quot;355-370&quot;,
+  year = 1980
+)</pre>
+<p>In addition to this reference to the Copenhagen database, as it has become
+known, you should include one of the following papers (or both) as a reference
+to the profile processing:</p>
+<pre>@incollection(Granum-al89,
+  author = &quot;E Granum and M G Thomason and J Gregor&quot;,
+  title = &quot;On the use of automatically inferred {M}arkov networks for chromosome analysis&quot;,
+  pages = &quot;233--251&quot;,
+  editor = &quot;C Lundsteen and J Piper&quot;,
+  booktitle = &quot;Automation of Cytogenetics&quot;,
+  publisher = &quot;Springer-Verlag&quot;,
+  address = &quot;Berlin&quot;,
+  year = 1989
+)</pre>
+<pre>@article(GraTho90,
+  author = &quot;E Granum and M G Thomason&quot;,
+  title = &quot;Automatically inferred {M}arkov network models for classification of chromosomal band pattern structures&quot;,
+  journal = &quot;Cytometry&quot;,
+  volume = 11,
+  pages = &quot;26--39&quot;,
+  year = 1990
+)</pre>
+<h3 align="left">Description</h3>
+<p align="left">Note that the original dataset has been modified to fit into the
+standard sequence recognition format, where strings are coded as sequences of
+integers in the range (0, .. (1 - alphabet size)).</p>
+<p align="left">Here is a description of the original dataset (provided by Jens
+Gregor)</p>
+<pre><font color="#0000FF">The database consists of 44 files, e.g., dif22da,</font></pre>
+<pre><font color="#0000FF">that each have 100 lines of the form</font></pre>
+<pre><font color="#0000FF">/ 5467 119 22 27 9 / AA==a==E===d==A==a=Aa=A=a=b</font></pre>
+<pre><font color="#0000FF">where 5467 is a unique chromosome identifier, 119 refers to the</font></pre>
+<pre><font color="#0000FF">metaphase the sample came from (1..180), 22 is the chromosome type,</font></pre>
+<pre><font color="#0000FF">27 is the overall string length, and 9 is the length of the p-arm,</font></pre>
+<pre><font color="#0000FF">i.e., the centromere position. The slashes are, of course, only</font></pre>
+<pre><font color="#0000FF">delimiters and should be ignored, i.e., the alphabet consists of</font></pre>
+<pre><font color="#0000FF">the letters a-f, A-F.</font></pre>
+<p>The dataset used in our sequence recognition experiments was obtained as
+follows.</p>
+<p>Firstly, the centromere positions were discarded, by ignoring the start of
+each string up to the second slash.</p>
+<p>Then, the following mapping was used to map letters into integers:</p>
+<pre><b>    a     -&gt;    0
+    b     -&gt;    1
+    c     -&gt;    2
+    d     -&gt;    3
+    e     -&gt;    4
+    f     -&gt;    5
+    =     -&gt;    6
+    A     -&gt;    7
+    B     -&gt;    8
+    C     -&gt;    9
+    D     -&gt;    10
+    E     -&gt;    11
+    F     -&gt;    12
+</b></pre>
+<p>Note that in the original dataset the letters (and '=') represented a
+difference coding of successive sample positions, where '=' meant that the two
+successive samples were equal, and the upper and lower case letters were used to
+represent positive and negative differences respectively.&nbsp; The alphabetic
+position coded the level of the difference (a = diff of 1, e = diff of 5).</p>
+<p>Therefore, one can build a recognizer for this dataset based on a weighted
+Levenstein string distance measure that sets up weights based on these
+difference levels.&nbsp; The paper below describes results based on an
+efficiently computable approximation of such measures.&nbsp; </p>
+<blockquote>
+  <h3><font color="#0000FF">On the Use of Normalized Edit Distances and an
+  Efficient k-NN Search Technique (k-AESA) for Fast and Accurate String
+  Classification</font></h3>
+  <p><font color="#0000FF"><b>A. Juan and E. Vidal</b><br>
+  <i>Universitat Politècnica de València</i></font></p>
+  <p><font color="#0000FF">Classification based on Nearest Neighbors (NN) is a
+  uniformly good approach to many Pattern Recognition (PR) tasks. However, two
+  important aspects need to be taken into account to actually achieve good
+  performance in practice. The first one is the metric or dissimilarity measure
+  adopted to compare the considered patterns. The second is the computational
+  cost incurred by the NN searching operation. As it is shown in this paper, by
+  using the adequate techniques to cope with these two issues, NN-based
+  classification leads to better results than those obtained by other approaches
+  that have been applied to a task of human banded chromosomes classification.</font></p>
+  <p><font color="#0000FF">Keywords: Normalized Edit Distance, Fast k-NN Search,
+  String Classification, Human Banded Chromosomes Classification</font></p>
+  <p><font color="#0000FF"><b><font size="2">Proceedings of the International
+  Conference on Pattern Recognition (ICPR'00)</font></b><br>
+  <font size="2"><i>Copyright (c) 2000 Institute of Electrical and Electronics
+  Engineers, Inc. All rights reserved.</i></font></font></p>
+</blockquote>
+<p>However, it is also of interest to see how well machine learning/pattern
+recognition algorithms can do without this prior knowledge.&nbsp; This, and the
+need to provide a standard interface that is appropriate across a wide class of
+symbol sequence recognition problems, was the justification for recoding the
+dataset as a set of integer sequences.</p>
+<h3>Dataset Partitions</h3>
+<p>There are two named versions of the dataset set up on the evaluation server:
+CopChrom and CopChromRand, the difference being the way the dataset is
+partitioned into training and test sets.</p>
+<h4>CopChrom</h4>
+<p>In CopChrom the partition is fixed, with the same test and training sets used
+in the Juan and Vidal paper above (except that in their paper they also swapped
+the test set with the training set in order to generate two experiments from the
+fixed partition).</p>
+<h4><a name="CopChromRand">CopChromRand</a></h4>
+<p>In CopChromRand each experiment is run with a different random partition of
+the dataset.&nbsp; In each case, a randomly chosen 50% of the data for each
+class is used for training, with the remaining data being used for
+testing.&nbsp; This allows for better estimates of the statistical significance
+of the difference between various methods.&nbsp; A better alternative to using
+different random partitions every time, would be to use an identified set of
+random partitions - which would then allow us to use a more powerful paired
+t-test, but this is not yet implemented so we use an unpaired t-test.&nbsp;
+Since the different random partitions are drawn from the same sample, they are
+not statistically independent, which means that the significance of the
+differences are overstated.</p>
+<h4><a name="CopChromTwo">CopChromTwo</a></h4>
+<p>This dataset is like the randomized version above, except that only two
+chromosome classes are included.&nbsp; We include chromosome classes 4 and 5, as
+these are the ones with the highest mutual confusability when classified using
+an unweighted edit distance measure.&nbsp; This allows for much faster testing
+of new algorithms than using the full dataset - though we've yet to test the
+correlation between performance on this data and performance on the full
+dataset.</p>
+
+</body>
+
+</html>
