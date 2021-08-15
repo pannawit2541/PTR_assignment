@@ -14,33 +14,65 @@ def edit_distance(str1="",str2=""):
             if str1[i-1] != str2[j-1]:
                 cost += 1
             edit_distance[i,j] =  cost
-
     return edit_distance,edit_distance[-1,-1]
 
-def generate_U(arr):
-    i = arr.shape[1]-1
-    for col in arr.T:
-        if i < 0 :
-            id = np.random.randint(0, arr.shape[1]-1)
-            col[id] = 1
-        else : 
-            col[i] = 1
-            i -= 1
-        
+def min_index(arr):
+    mean_arr = np.mean(distance,axis=1)
+    id = np.argmin(mean_arr)
+    return id
     
-    return arr
+def update_Et(arr1,arr2):
+    distance = edit_distance(arr1,arr2) 
+    return np.max(distance)
 
-def calculate_distance(X,k_means):
+
+def generate_U(distanc_vector):
+
+    U = np.zeros(distanc_vector.shape)
+    minEachCols = np.argmin(distanc_vector, axis=0)
+
+    for i in range(U.shape[1]):
+        U[minEachCols[i],i] = 1
+
+    return U
+
+def calculate_distance(X1,X2):
+    """calculate each distance of X1,X2 when |X1| >= |X2|
+
+    Args:
+        X1 (Array): Sameple of data 
+        X2 (Array): K-mean cluster or any sameple of data 
+
+    Returns:
+        Array: Metrix has size : (|X2|,|X1|)
+    """
     distance = []
-    for x in X:
+  
+    for c in X2:
         d = []
-        for c in k_means:
-            _,edit_dis = edit_distance(x,c)
+        for x in X1:
+            _,edit_dis = edit_distance(c,x)
             d.append(edit_dis)
-        print(d)
         distance.append(d)
+        
 
-    return np.array(distance).reshape(X.shape[0],k_means.shape[0])
+    return np.array(distance).reshape(X2.shape[0],X1.shape[0])
+
+def update_k_means(X,U): 
+    V_new = np.zeros(U.shape[0])
+    for c in range(U.shape[0]):
+        id = np.where(U[c,:] == 1)
+        str_arr = []
+        for j in id:
+            str_arr.append(X[j])
+        str_arr = np.array(str_arr).reshape(-1)
+        distance = calculate_distance(str_arr,str_arr)
+        id = min_index(distance)
+        V_new[c] = str_arr[id]
+        print(V_new)
+
+    return V_new
+        
 
 
 def preprocess_data(path):
@@ -59,25 +91,21 @@ def preprocess_data(path):
                 
 if __name__ == "__main__":
     
-    chromosome,type = preprocess_data('./chrom/') # preprocess data
-
-    k = 22 # number of k-means
+    X,Y = preprocess_data('./chrom/') # preprocess data
+    X = X[:10]
+    Y = Y[:10]
+    k = 2 # number of k-means
     t_max =  1000000 # maximum number of iteration
     threshold = 10e-6 # termination theshold 
-    k_means = np.random.choice(chromosome, k) # random pick up k means 
-  
-    U = generate_U(np.zeros((type.shape[0],chromosome.shape[0])))
-    print(U)
+    Et = float('inf') 
 
+    V = np.random.choice(X, k) # pick up k-mean cluster from X
+    distance = calculate_distance(X,V)
+    U = generate_U(distance)
 
-    # TODO: calculate EditDistance between mean and X
-    # ---------------------------------------------
-    # distance = calculate_distance(chromosome,k_means)
-    # print(distance)
+    V_new = update_k_means(X,U)
+    # Et = np.max()
 
-
-
-    # ---------------------------------------------
 
 
 
