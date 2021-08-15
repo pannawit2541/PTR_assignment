@@ -17,13 +17,16 @@ def edit_distance(str1="",str2=""):
     return edit_distance,edit_distance[-1,-1]
 
 def min_index(arr):
-    mean_arr = np.mean(distance,axis=1)
+    mean_arr = np.mean(arr,axis=1)
     id = np.argmin(mean_arr)
     return id
     
 def update_Et(arr1,arr2):
-    distance = edit_distance(arr1,arr2) 
-    return np.max(distance)
+    distance = []
+    for i in range(arr1.shape[0]):
+        _,d = edit_distance(arr1[i],arr2[i])
+        distance.append(d)
+    return max(distance)
 
 
 def generate_U(distanc_vector):
@@ -59,19 +62,19 @@ def calculate_distance(X1,X2):
     return np.array(distance).reshape(X2.shape[0],X1.shape[0])
 
 def update_k_means(X,U): 
-    V_new = np.zeros(U.shape[0])
+    V_new = []
     for c in range(U.shape[0]):
         id = np.where(U[c,:] == 1)
         str_arr = []
         for j in id:
             str_arr.append(X[j])
         str_arr = np.array(str_arr).reshape(-1)
+        print("cluster ",c+1,"size is :",len(str_arr))
         distance = calculate_distance(str_arr,str_arr)
-        id = min_index(distance)
-        V_new[c] = str_arr[id]
-        print(V_new)
+        min_id = min_index(distance)
+        V_new.append(str_arr[min_id])
 
-    return V_new
+    return np.array(V_new)
         
 
 
@@ -92,20 +95,24 @@ def preprocess_data(path):
 if __name__ == "__main__":
     
     X,Y = preprocess_data('./chrom/') # preprocess data
-    X = X[:10]
-    Y = Y[:10]
-    k = 2 # number of k-means
+    k = 22 # number of k-means
+    X = X[:1440]
+    Y = Y[:1440]
     t_max =  1000000 # maximum number of iteration
     threshold = 10e-6 # termination theshold 
     Et = float('inf') 
-
     V = np.random.choice(X, k) # pick up k-mean cluster from X
-    distance = calculate_distance(X,V)
-    U = generate_U(distance)
 
-    V_new = update_k_means(X,U)
-    # Et = np.max()
+    for i in range(t_max):
+        print("-------------------------------- epoch:", i+1, "--------------------------------")
+        distance = calculate_distance(X,V)
+        U = generate_U(distance)
 
+        V_new = update_k_means(X,U)
+        Et = update_Et(V,V_new)
+        print("-------------------------------- Et:", Et, "--------------------------------")
+        if Et <= threshold : break
+        V = V_new
 
 
 
