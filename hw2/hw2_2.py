@@ -28,6 +28,10 @@ def update_Et(arr1,arr2):
         distance.append(d)
     return max(distance)
 
+def predict(U,y_test):
+    predict = np.sum(U,axis=1)
+    unique, counts = np.unique(y_test, return_counts=True)
+    return predict,dict(zip(unique, counts))
 
 def generate_U(distanc_vector):
 
@@ -75,9 +79,7 @@ def update_k_means(X,U):
         V_new.append(str_arr[min_id])
 
     return np.array(V_new)
-        
-
-
+    
 def preprocess_data(path):
     data = []
     for filename in os.listdir(path):
@@ -94,27 +96,31 @@ def preprocess_data(path):
                 
 if __name__ == "__main__":
     
-    X,Y = preprocess_data('./chrom/') # preprocess data
+    X_train,Y_train = preprocess_data('./chrom/train_set/') # preprocess data
+    x_test,y_test = preprocess_data('./chrom/test_set/') 
     k = 22 # number of k-means
-    X = X[:1440]
-    Y = Y[:1440]
     t_max =  1000000 # maximum number of iteration
     threshold = 10e-6 # termination theshold 
     Et = float('inf') 
-    V = np.random.choice(X, k) # pick up k-mean cluster from X
+    V = np.random.choice(X_train, k) # pick up k-mean cluster from X
 
+    #* Train cluster
     for i in range(t_max):
         print("-------------------------------- epoch:", i+1, "--------------------------------")
-        distance = calculate_distance(X,V)
+        distance = calculate_distance(X_train,V)
         U = generate_U(distance)
 
-        V_new = update_k_means(X,U)
+        V_new = update_k_means(X_train,U)
         Et = update_Et(V,V_new)
         print("-------------------------------- Et:", Et, "--------------------------------")
         if Et <= threshold : break
         V = V_new
 
+    #* Test cluster
+        distance_pre = calculate_distance(x_test,V)
+        U_test = generate_U(distance_pre)
+        y_pre,counts_y_test= predict(U_test,y_test)
+        print(y_pre,counts_y_test)
 
-
-
+    
         
