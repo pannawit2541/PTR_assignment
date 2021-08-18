@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
-
+import pandas as pd
 
 # mean
 def mean(x): return np.round(x.mean(axis=0),3)
@@ -122,6 +122,18 @@ if __name__ == "__main__":
     data = np.genfromtxt('TWOCLASS.csv',delimiter=',')[1:,:]
     np.random.shuffle(data) # shuffle data
 
+    # mean1_t1 = []
+    # mean2_t1 = []
+    # cov1_t1 = []
+    # cov2_t1 = []
+    # conf_t1 = [] 
+
+    # mean1_t2 = []
+    # mean2_t2 = []
+    # cov1_t2 = []
+    # cov2_t2 = []
+    # conf_t2 = [] 
+
     k = 1
     for i,j in cross_validations_split(data.shape[0],10):
 
@@ -148,19 +160,46 @@ if __name__ == "__main__":
         
         print("############### K=", k ," #################")
         k+=1
-        print("test1: ",confusion_matrix(y_pred1,y_true1))
-        print("mean1: ",x1['mean1'])
-        print("mean2: ",x1['mean2'])
-        print("cov1: ",x1['cov1'])
-        print("cov2: ",x1['cov2'])
-        print("--------------------------------")
-        print("test2:",confusion_matrix(y_pred2,y_true2))
-        print("mean1: ",x2['mean1'])
-        print("mean2: ",x2['mean2'])
-        print("cov1: ",x2['cov1'])
-        print("cov2: ",x2['cov2'])
-        print("--------------------------------")
+    
+        # conf_t1.append(confusion_matrix(y_pred1,y_true1).astype(int))
+        # mean1_t1.append(x1['mean1'])
+        # mean2_t1.append(x1['mean2'])
+        # cov1_t1.append(x1['cov1'])
+        # cov2_t1.append(x1['cov2'])
+
+        # print("--------------------------------")
+        # conf_t2.append(confusion_matrix(y_pred2,y_true2).astype(int))
+        # mean1_t2.append(x2['mean1'])
+        # mean2_t2.append(x2['mean2'])
+        # cov1_t2.append(x2['cov1'])
+        # cov2_t2.append(x2['cov2'])
+        # print("--------------------------------")
 
 
+    # mean1_t1 = np.array(mean1_t1).reshape(-1,4)
+    # np.savetxt("mean1_t1.csv",mean1_t1,delimiter=",")
+    # mean2_t1 = np.array(mean2_t1).reshape(-1,4)
+    # np.savetxt("mean2_t1.csv",mean2_t1,delimiter=",")
+
+    # cov1_t1 = np.array(cov1_t1).reshape(-1,4)
+    # np.savetxt("cov1_t1.csv",cov1_t1,delimiter=",")
+    
+    # print(len(cov2_t1))
+    # cov2_t1 = np.array(cov2_t1).reshape(-1,4)
+    # np.savetxt("cov2_t1.csv",cov2_t1,delimiter=",")
+    
+    # conf_t1 = np.array(conf_t1).reshape(-1,2)
+    # np.savetxt("conf_t1.csv",conf_t1,delimiter=",")
+
+    # mean1_t2 = np.array(mean1_t2).reshape(-1,2)
+    # np.savetxt("mean1_t2.csv",mean1_t2,delimiter=",")
+    # mean2_t2 = np.array(mean2_t2).reshape(-1,2)
+    # np.savetxt("mean2_t2.csv",mean2_t2,delimiter=",")
+    # cov1_t2 = np.array(cov1_t2).reshape(-1,2)
+    # np.savetxt("cov1_t2.csv",cov1_t2,delimiter=",")
+    # cov2_t2 = np.array(cov2_t2).reshape(-1,2)
+    # np.savetxt("cov2_t2.csv",cov2_t2,delimiter=",")
+    # conf_t2 = np.array(conf_t2).reshape(-1,2)
+    # np.savetxt("conf_t2.csv",conf_t2,delimiter=",")
     
 
