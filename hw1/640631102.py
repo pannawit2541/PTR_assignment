@@ -18,15 +18,9 @@ def multi_distribution(X,cov,mean):
     const = ((2*np.pi)**(cov.shape[1]/2))
     cov_norm = LA.norm(cov)**(0.5)
 
-    # ? if err : use this below
-    # exp = np.exp(-0.5*np.dot(np.dot((X-mean),LA.inv(cov)),(X-mean).T))
-    # return ((1/(const*cov_norm))*exp).diagonal().reshape(-1,1) # return only diagonal values
-    # ? ------------------------
-
     exp = np.array(list(map(lambda x: np.exp(-0.5*np.dot(np.dot((x-mean),LA.inv(cov)),(x-mean).T)),X)))
     return ((1/(const*cov_norm))*exp) 
     
-
 # cross_validations
 def cross_validations_split(shape,folds):
     fold_size = int(shape * folds/100)
@@ -122,18 +116,6 @@ if __name__ == "__main__":
     data = np.genfromtxt('TWOCLASS.csv',delimiter=',')[1:,:]
     np.random.shuffle(data) # shuffle data
 
-    # mean1_t1 = []
-    # mean2_t1 = []
-    # cov1_t1 = []
-    # cov2_t1 = []
-    # conf_t1 = [] 
-
-    # mean1_t2 = []
-    # mean2_t2 = []
-    # cov1_t2 = []
-    # cov2_t2 = []
-    # conf_t2 = [] 
-
     k = 1
     for i,j in cross_validations_split(data.shape[0],10):
 
@@ -157,49 +139,7 @@ if __name__ == "__main__":
         y_pred2 = bayes_rules(fx2_1,fx2_2,x2['p1'],x2['p2'])
         y_true2 = x2['y_sample']
 
-        
         print("############### K=", k ," #################")
         k+=1
-    
-        # conf_t1.append(confusion_matrix(y_pred1,y_true1).astype(int))
-        # mean1_t1.append(x1['mean1'])
-        # mean2_t1.append(x1['mean2'])
-        # cov1_t1.append(x1['cov1'])
-        # cov2_t1.append(x1['cov2'])
-
-        # print("--------------------------------")
-        # conf_t2.append(confusion_matrix(y_pred2,y_true2).astype(int))
-        # mean1_t2.append(x2['mean1'])
-        # mean2_t2.append(x2['mean2'])
-        # cov1_t2.append(x2['cov1'])
-        # cov2_t2.append(x2['cov2'])
-        # print("--------------------------------")
-
-
-    # mean1_t1 = np.array(mean1_t1).reshape(-1,4)
-    # np.savetxt("mean1_t1.csv",mean1_t1,delimiter=",")
-    # mean2_t1 = np.array(mean2_t1).reshape(-1,4)
-    # np.savetxt("mean2_t1.csv",mean2_t1,delimiter=",")
-
-    # cov1_t1 = np.array(cov1_t1).reshape(-1,4)
-    # np.savetxt("cov1_t1.csv",cov1_t1,delimiter=",")
-    
-    # print(len(cov2_t1))
-    # cov2_t1 = np.array(cov2_t1).reshape(-1,4)
-    # np.savetxt("cov2_t1.csv",cov2_t1,delimiter=",")
-    
-    # conf_t1 = np.array(conf_t1).reshape(-1,2)
-    # np.savetxt("conf_t1.csv",conf_t1,delimiter=",")
-
-    # mean1_t2 = np.array(mean1_t2).reshape(-1,2)
-    # np.savetxt("mean1_t2.csv",mean1_t2,delimiter=",")
-    # mean2_t2 = np.array(mean2_t2).reshape(-1,2)
-    # np.savetxt("mean2_t2.csv",mean2_t2,delimiter=",")
-    # cov1_t2 = np.array(cov1_t2).reshape(-1,2)
-    # np.savetxt("cov1_t2.csv",cov1_t2,delimiter=",")
-    # cov2_t2 = np.array(cov2_t2).reshape(-1,2)
-    # np.savetxt("cov2_t2.csv",cov2_t2,delimiter=",")
-    # conf_t2 = np.array(conf_t2).reshape(-1,2)
-    # np.savetxt("conf_t2.csv",conf_t2,delimiter=",")
-    
+ 
 
